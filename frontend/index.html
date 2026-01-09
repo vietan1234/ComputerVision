@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Vân tay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="page-header">
+    <h1>QUẢN LÝ HỒ SƠ SINH TRẮC</h1>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="tab1">1) Kết nối & Lấy mẫu</button>
+    <button class="tab-btn" data-tab="tab2">2) Xác minh hồ sơ</button>
+    <button class="tab-btn" data-tab="tab3">3) Nhận dạng vân tay</button>
+  </nav>
+
+  <main class="workspace">
+    <section id="tab1" class="tab-pane active">
+      <div class="two-col">
+        <!-- LEFT COLUMN -->
+        <div class="card fill">
+          <h2>Kết nối & Khởi tạo</h2>
+          <div class="row">
+            <div>
+              <label>Prefer device name (tuỳ chọn)</label>
+              <input id="txtPrefer" placeholder="VD: FS80H"/>
+            </div>
+            <div>
+              <label>Client Key (nếu có)</label>
+              <input id="txtClientKey" placeholder="Optional"/>
+            </div>
+            <div class="btn-col">
+              <button id="btnConnectInit">Kết nối & Khởi tạo</button>
+              <div id="busyConnect" class="busy" style="display:none">
+                <span class="spinner"></span> Đang kết nối…
+              </div>
+            </div>
+          </div>
+
+          <!-- PREVIEW MOVED HERE -->
+          <div class="stack-gap">
+            <label>Ảnh vân tay (296×354)</label>
+            <div class="row-nowrap">
+
+  <!-- ẢNH GỐC -->
+  <div class="preview-box main-preview">
+    <img id="preview" alt="Xem trước vân tay"/>
+  </div>
+  <div id="pipelineThumb" class="pipeline-thumb">
+  <img id="pipelineThumbImg" alt="Xem trước pipeline">
+  <span class="pipeline-label">Xem pipeline</span>
+</div>
+
+</div>
+
+          </div>
+
+          <div class="flex-spacer"></div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="card fill">
+          <!-- Controls (trên cùng) -->
+          <div class="row">
+            <div>
+              <label>Quality (1–100)</label>
+              <input id="txtQuality" type="number" value="60" min="1" max="100" style="width:140px"/>
+            </div>
+            <div>
+              <label>Timeout (giây, ≥0; 0 = không giới hạn)</label>
+              <input id="txtTimeout" type="number" value="10" min="0" step="1" style="width:170px"/>
+            </div>
+            <div class="btn-col">
+              <button id="btnCapture">Quét vân tay</button>
+              <div id="busyCapture" class="busy" style="display:none">
+                <span class="spinner"></span> Đang chụp…
+              </div>
+            </div>
+            <div class="btn-col">
+              <button id="btnGetTemplate" disabled>Lấy đặc trưng</button>
+            </div>
+          </div>
+
+          <!-- Profile form (đưa LÊN CAO sát control) -->
+          <h3 class="top-gap">Thông tin hồ sơ</h3>
+          <div class="row">
+            <div class="flex1">
+              <label>Họ tên</label>
+              <input id="fullName" placeholder="Nguyễn Văn A"/>
+            </div>
+            <div>
+              <label>Giới tính</label>
+              <select id="gender">
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row top-gap">
+            <div>
+              <label>Năm</label>
+              <input id="dobYear" type="number" min="1900" max="2100" value="2000" style="width:120px"/>
+            </div>
+            <div>
+              <label>Tháng</label>
+              <select id="dobMonth" style="width:120px"></select>
+            </div>
+            <div>
+              <label>Ngày</label>
+              <select id="dobDay" style="width:120px"></select>
+            </div>
+            <div class="btn-col">
+              <button id="btnSaveRaw3" disabled>Lưu hồ sơ</button>
+              <div id="busySave" class="busy" style="display:none">
+                <span class="spinner"></span> Đang lưu…
+              </div>
+            </div>
+          </div>
+
+          <!-- Template progress -->
+          <div class="stack-gap">
+            <label>Tiến độ template</label>
+            <div id="statusTmpl" class="kv">0/1</div>
+          </div>
+
+          <div class="flex-spacer"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab2" class="tab-pane">
+  <div class="two-col">
+    <!-- LEFT: Search -->
+    <div class="card fill">
+      <h2>Tìm kiếm hồ sơ</h2>
+      <div class="row">
+        <div class="flex1">
+          <label>Tìm theo họ tên</label>
+          <input id="txtSearchName" placeholder="Nhập họ tên cần tìm">
+        </div>
+        <div class="btn-col">
+          <button id="btnSearch">Tìm kiếm</button>
+          <div id="busySearch" class="busy" style="display:none">
+            <span class="spinner"></span> Đang tìm…
+          </div>
+        </div>
+      </div>
+      <div class="stack-gap">
+        <label>Kết quả</label>
+        <div id="searchInfo" class="muted">Chưa tìm</div>
+        <ul id="lstProfiles" style="list-style:none;padding:0;margin:6px 0;max-height:220px;overflow:auto"></ul>
+      </div>
+    </div>
+
+    <!-- RIGHT: Capture → Verify -->
+    <div class="card fill">
+      <h2>Quét vân tay → Xác minh</h2>
+      <div class="row">
+        <div>
+          <label>Quality</label>
+          <input id="txtQ2" type="number" value="60" min="1" max="100" style="width:120px">
+        </div>
+        <div>
+          <label>Timeout (giây)</label>
+          <input id="txtT2" type="number" value="10" min="0" step="1" style="width:120px">
+        </div>
+        <div class="btn-col">
+          <button id="btnCap2" disabled>Quét vân tay</button>
+          <div id="busyCap2" class="busy" style="display:none">
+            <span class="spinner"></span> Đang chụp…
+          </div>
+        </div>
+        <div class="btn-col">
+          <button id="btnVerify2" disabled>Xác minh</button>
+          <div id="busyV2" class="busy" style="display:none">
+            <span class="spinner"></span> Đang xác minh…
+          </div>
+        </div>
+      </div>
+
+      <div class="row top-gap">
+        <div>
+          <label>Ảnh mới</label>
+          <div class="preview-box">
+            <img id="preview2" class="fp-img" alt="Xem trước">
+          </div>
+        </div>
+        <div class="flex1">
+          <label>Hồ sơ đã chọn</label>
+          <div id="chosenProfile" class="kv">Chưa chọn</div>
+          <div class="stack-gap">
+            <label>Kết quả xác minh</label>
+            <pre id="verifyOut" class="kv">Chưa chạy</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="tab3" class="tab-pane">
+  <div class="two-col">
+
+    <!-- LEFT SIDE: Capture -->
+    <div class="card fill">
+      <h2>Quét vân tay để nhận dạng (1:N)</h2>
+
+      <div class="row">
+        <div>
+          <label>Quality</label>
+          <input id="txtQ3" type="number" value="60" min="1" max="100" style="width:120px">
+        </div>
+        <div>
+          <label>Timeout (giây)</label>
+          <input id="txtT3" type="number" value="10" min="0" step="1" style="width:120px">
+        </div>
+
+        <div class="btn-col">
+          <button id="btnCap3">Quét vân tay</button>
+          <div id="busyCap3" class="busy" style="display:none">
+            <span class="spinner"></span> Đang chụp…
+          </div>
+        </div>
+
+        <div class="btn-col">
+          <button id="btnIdentify3" disabled>Nhận dạng</button>
+          <div id="busyId3" class="busy" style="display:none">
+            <span class="spinner"></span> Đang tìm…
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-gap">
+        <label>Ảnh mới</label>
+        <div class="preview-box">
+          <img id="preview3" class="fp-img" alt="Xem trước"/>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE: Result -->
+    <div class="card fill">
+      <h2>Kết quả Nhận dạng (1:N)</h2>
+
+      <div class="stack-gap">
+        <label>Kết quả</label>
+        <pre id="identifyOut" class="kv">Chưa chạy</pre>
+      </div>
+
+      <div class="stack-gap">
+        <label>Thông tin hồ sơ</label>
+        <div id="identifyInfo" class="kv">–</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+  </main>
+
+  <footer id="logBar">
+    <div class="log-toolbar">
+      <strong>Logs</strong>
+      <label><input type="checkbox" id="chkCurrentTab"> Chỉ tab hiện tại</label>
+      <button id="btnClearLog">Xoá log</button>
+      
+    </div>
+    
+    <div id="log"></div>
+  </footer>
+  <!-- Pipeline Popup -->
+<div id="pipelineModal" class="modal hidden">
+  <div class="modal-content">
+    <span id="pipelineClose" class="modal-close">&times;</span>
+
+    <div class="modal-body">
+      <button id="pipelinePrev" class="nav-btn">←</button>
+
+      <div>
+        <div class="modal-image-box">
+          <img id="pipelineImage">
+        </div>
+        <div id="pipelineStepLabel" class="modal-step-label"></div>
+      </div>
+
+      <button id="pipelineNext" class="nav-btn">→</button>
+    </div>
+  </div>
+</div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
