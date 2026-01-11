@@ -75,24 +75,68 @@ class Verify3Resp(BaseModel):
 # ====== ROUTES ======
 @app.post("/extract", response_model=ExtractResp)
 def extract(req: ExtractReq):
+    import time
+    start_time = time.time()
+    
     try:
         img_bytes = base64.b64decode(req.image_b64.encode("utf-8"))
-        gray = bmp_to_gray_np(img_bytes)
+        
+        # Use new function with metadata
+        from get_template.io import bmp_to_gray_np_with_meta
+        gray, align_meta = bmp_to_gray_np_with_meta(img_bytes)
+        
+        expected_shape = (354, 296)
+        if gray.shape != expected_shape:
+            return {
+                "ok": False,
+                "minutiae_count": 0,
+                "json_debug": {},
+                "error": f"Shape mismatch after alignment: got {gray.shape}, expected {expected_shape}"
+            }
 
         # enhance() trả (enh, orient, coh)
         enh, orient, coh = enhance(gray)
+        
+        # Shape invariant check
+        if enh.shape != expected_shape:
+            return {
+                "ok": False,
+                "minutiae_count": 0,
+                "json_debug": {},
+                "error": f"Shape mismatch after enhance: got {enh.shape}, expected {expected_shape}"
+            }
+        
         skel, bin_img = binarize_and_thin(enh)
+        
+        # Shape invariant check
+        if skel.shape != expected_shape:
+            return {
+                "ok": False,
+                "minutiae_count": 0,
+                "json_debug": {},
+                "error": f"Shape mismatch after skeleton: got {skel.shape}, expected {expected_shape}"
+            }
 
         # extract_minutiae(skel, binary, orient, coh)
         mins = extract_minutiae(skel, bin_img, orient, coh)
-
+        
+        elapsed_ms = int((time.time() - start_time) * 1000)
 
         debug_imgs = {
             "minutiae": mins,
+            # gray_png_b64: ảnh grayscale input (không auto-center)
             "gray_png_b64": to_b64_png(gray),
             "enhance_png_b64": to_b64_png(enh),
             "binary_png_b64": to_b64_png(bin_img),
             "skeleton_png_b64": to_b64_png(skel),
+            # Metrics for debugging
+            "metrics": {
+                "minutiae_count": len(mins),
+                "align_dx": align_meta.get("center_dx", 0),
+                "align_dy": align_meta.get("center_dy", 0),
+                "centered": align_meta.get("centered", False),
+                "time_ms": elapsed_ms,
+            }
         }
 
         # -------- Orientation (HSV) --------
@@ -118,7 +162,8 @@ def extract(req: ExtractReq):
 
 
     except Exception as ex:
-        return {"ok": False, "minutiae_count": 0, "json_debug": {}, "error": f"{ex}"}
+        import traceback
+        return {"ok": False, "minutiae_count": 0, "json_debug": {}, "error": f"{ex}\n{traceback.format_exc()}"}
 
 
 @app.post("/fuse", response_model=FuseResp)

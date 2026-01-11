@@ -146,9 +146,10 @@ def match_minutiae_ransac_consistency(
         return {"ok": False, "inliers": 0, "score": 0.0,
                 "dbg": {"reason": "no_points"}}
 
-    ANGLE_LIMIT_DEG = 14.0
-    DIST_LIMIT = 10
-    MIN_MATCH = 9
+    # Tuned thresholds for 500dpi MFS500 sensor
+    ANGLE_LIMIT_DEG = 16.0   # Nới từ 14 -> 16 để tolerant hơn với slight rotation
+    DIST_LIMIT = 12          # Nới từ 10 -> 12 pixels để tolerant finger placement
+    MIN_MATCH = 8            # Giảm từ 9 -> 8 để không miss true matches
 
     angle_limit = math.radians(ANGLE_LIMIT_DEG)
 

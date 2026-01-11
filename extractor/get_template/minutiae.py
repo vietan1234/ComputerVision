@@ -70,9 +70,6 @@ def estimate_orientation_map(enhanced: np.ndarray, ksize: int = 11):
     """
     Ước lượng hướng ridge cho mỗi pixel (rad) + coherence 0..1
     dùng cho ảnh đã enhance (uint8).
-
-    Kích thước cửa sổ định hướng tương đương Hong/ZIP2:
-      - ksize: dùng làm sigma cho gaussian smoothing trong không gian.
     """
     if enhanced.ndim != 2:
         raise ValueError("enhanced phải là ảnh gray (H,W).")
@@ -126,7 +123,7 @@ def extract_minutiae(skel: np.ndarray,
     """
     Tìm minutiae bằng Crossing Number trên skeleton.
     - skel: ảnh xương (255 ridge, 0 nền)
-    - bin_img: binary gốc (255 ridge, 0 nền hoặc ngược lại – ở đây chủ yếu để về sau mở rộng)
+    - bin_img: binary gốc (255 ridge, 0 nền)
     - orient_map: hướng ridge (rad)
     - coh_map: coherence 0..1
     """

@@ -1,0 +1,145 @@
+<section id="tab2" class="tab-pane">
+    <div class="two-col">
+
+        <!-- LEFT: Tìm hồ sơ -->
+        <div class="card fill">
+            <h2>Tìm hồ sơ đã đăng ký</h2>
+            <div class="row">
+                <input id="txtSearchName" type="text" placeholder="Nhập tên…" style="flex:1">
+                <button id="btnSearch">Tìm</button>
+            </div>
+            <div class="stack-gap">
+                <label>Kết quả</label>
+                <div id="searchInfo" class="muted">Chưa tìm</div>
+                <ul id="lstProfiles" style="list-style:none;padding:0;margin:6px 0;max-height:220px;overflow:auto"></ul>
+            </div>
+        </div>
+
+        <!-- RIGHT: Capture → Verify -->
+        <div class="card fill">
+            <h2>Quét vân tay → Xác minh</h2>
+            <!-- Row: Inputs + Buttons nằm ngang -->
+            <div class="row">
+                <div>
+                    <label>Quality</label>
+                    <input id="txtQ2" type="number" value="60" min="1" max="100" style="width:100px">
+                </div>
+                <div>
+                    <label>Timeout (giây)</label>
+                    <input id="txtT2" type="number" value="10" min="0" step="1" style="width:100px">
+                </div>
+                <div class="btn-col">
+                    <button id="btnCap2" disabled>Quét vân tay</button>
+                    <div id="busyCap2" class="busy" style="display:none">
+                        <span class="spinner"></span> Đang chụp…
+                    </div>
+                </div>
+                <div class="btn-col">
+                    <button id="btnVerify2" disabled>Xác minh</button>
+                    <div id="busyV2" class="busy" style="display:none">
+                        <span class="spinner"></span> Đang xác minh…
+                    </div>
+                </div>
+            </div>
+
+            <div class="row top-gap">
+                <div>
+                    <label>Ảnh mới (Probe)</label>
+                    <div class="preview-box">
+                        <img id="preview2" class="fp-img" alt="Xem trước">
+                    </div>
+                </div>
+                <div>
+                    <label>Ảnh đã lưu (Enrolled)</label>
+                    <div class="preview-box">
+                        <img id="enrolledImg2" class="fp-img" alt="Ảnh enrolled">
+                    </div>
+                </div>
+                <div class="flex1">
+                    <label>Hồ sơ đã chọn</label>
+                    <div id="chosenProfile" class="kv">Chưa chọn</div>
+                    <div class="stack-gap">
+                        <label>Kết quả xác minh</label>
+                        <pre id="verifyOut" class="kv">Chưa chạy</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section id="tab3" class="tab-pane">
+    <div class="two-col">
+
+        <!-- LEFT SIDE: Capture -->
+        <div class="card fill">
+            <h2>Quét vân tay để nhận dạng (1:N)</h2>
+
+            <!-- Row: Inputs + Buttons nằm ngang -->
+            <div class="row">
+                <div>
+                    <label>Quality</label>
+                    <input id="txtQ3" type="number" value="60" min="1" max="100" style="width:100px">
+                </div>
+                <div>
+                    <label>Timeout (giây)</label>
+                    <input id="txtT3" type="number" value="10" min="0" step="1" style="width:100px">
+                </div>
+                <div class="btn-col">
+                    <button id="btnCap3">Quét vân tay</button>
+                    <div id="busyCap3" class="busy" style="display:none">
+                        <span class="spinner"></span> Đang chụp…
+                    </div>
+                </div>
+                <div class="btn-col">
+                    <button id="btnIdentify3" disabled>Nhận dạng</button>
+                    <div id="busyId3" class="busy" style="display:none">
+                        <span class="spinner"></span> Đang tìm…
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-gap">
+                <label>Ảnh mới</label>
+                <div class="preview-box">
+                    <img id="preview3" class="fp-img" alt="Xem trước" />
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE: Result -->
+        <div class="card fill">
+            <h2>Kết quả Nhận dạng (1:N)</h2>
+
+            <div class="stack-gap">
+                <label>Kết quả</label>
+                <pre id="identifyOut" class="kv">Chưa chạy</pre>
+            </div>
+
+            <div class="stack-gap">
+                <label>Thông tin hồ sơ</label>
+                <div id="identifyInfo" class="kv">–</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+<footer id="logBar">
+    <div class="log-toolbar">
+        <strong>Logs</strong>
+        <label><input type="checkbox" id="chkCurrentTab"> Chỉ tab hiện tại</label>
+        <button id="btnClearLog">Xoá log</button>
+    </div>
+    <div id="logBody"></div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+
+</html>
